@@ -2,7 +2,7 @@ import crypto from "crypto";
 import getRawBody from "raw-body";
 
 const SHOPIFY_WEBHOOK_SECRET =
-  "f1dfc73b63a330d406d9a2e4e04c98927fe2548f0f39baaac2d4828ff0497663";
+  "8fc7e2d15deb9550d35fe69863c8a86806131f1959c598f3de81ef59ac39e403";
 
 export const config = {
   api: { bodyParser: false },
