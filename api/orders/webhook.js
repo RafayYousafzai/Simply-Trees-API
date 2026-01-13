@@ -1,5 +1,6 @@
 import crypto from "crypto";
 import getRawBody from "raw-body";
+import { Client } from "pg";
 
 const SHOPIFY_WEBHOOK_SECRET =
   "8fc7e2d15deb9550d35fe69863c8a86806131f1959c598f3de81ef59ac39e403";
@@ -73,6 +74,38 @@ async function processBacqyardOrder(order, refId) {
     body: JSON.stringify(externalPayload)
   });
   */
+
+  // Database Connection
+  const connectionString =
+    "postgresql://neondb_owner:npg_wGIl19RQscEa@ep-twilight-wind-ahg0973s-pooler.c-3.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require";
+
+  const client = new Client({
+    connectionString: connectionString,
+  });
+
+  try {
+    await client.connect();
+
+    const query = `
+      INSERT INTO orders (order_id, status, ref_id, total_price, order_details)
+      VALUES ($1, $2, $3, $4, $5)
+    `;
+
+    const values = [
+      order.id,
+      order.financial_status || "pending",
+      refId,
+      Math.floor(parseFloat(order.total_price)),
+      order,
+    ];
+
+    await client.query(query, values);
+    console.log(`💾 Saved Order ${order.id} to Neon DB successfully.`);
+  } catch (dbError) {
+    console.error("❌ Database Error:", dbError);
+  } finally {
+    await client.end();
+  }
 }
 
 // --- 🔌 HELPERS ---
